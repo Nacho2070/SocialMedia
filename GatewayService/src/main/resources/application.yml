@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: API-GATEWAY
+  main:
+    web-application-type: reactive
+
+  cloud:
+    gateway:
+      routes:
+        - id: UserService
+          uri: lb://UserService
+          predicates:
+            - Path=/authUser/**
+        - id: PostService
+          uri: lb://PostService
+          predicates:
+            - Path=/blogPost/**
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+server:
+  port: 8181
