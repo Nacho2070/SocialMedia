@@ -1,14 +1,12 @@
 package com.PostService.PostService.persistence.entity;
 
+import  jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.FieldType;
-import org.springframework.data.mongodb.core.mapping.MongoId;
-
 import java.io.Serializable;
 import java.util.*;
 
-@Document(collation = "blogPost")
+@Entity
+@Table(name = "blog_post")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,8 +14,9 @@ import java.util.*;
 @Builder
 public class BlogPost implements Serializable {
 
-    @MongoId(FieldType.OBJECT_ID)
-    private String blogPostId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long blogPostId;
 
     private String authorId;
 
@@ -29,6 +28,6 @@ public class BlogPost implements Serializable {
 
     private String content;
 
-    private LinkedList<Long> commentID = new LinkedList<>();
-
+    @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    private List<Like> likes = new ArrayList<>();
 }

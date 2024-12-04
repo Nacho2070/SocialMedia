@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 public class PostEventListener {
 
     @KafkaListener(topics= "PostTopic")
-    public void handlerOrderNotifications(ConsumerRecord<String,String> message){
-        log.info("PostAdded{}",message.value());
+    public void handlerOrderNotifications(String message){
+        log.info("PostAdded{}",message);
 
     }
 }

@@ -1,4 +1,4 @@
-package com.PostService.PostService.config;
+package com.CommentsService.CommentsService.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,10 +9,9 @@ import org.springframework.security.oauth2.server.resource.web.reactive.function
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.reactive.function.client.WebClient;
 
-
 @Configuration
 @EnableWebSecurity
-public class ConfigurationWeb {
+public class WebConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -24,9 +23,8 @@ public class ConfigurationWeb {
     @Bean
     public WebClient webClient() {
         return  WebClient.builder()
-                .baseUrl("http://localhost:8181/")
+                .baseUrl("http://localhost:8181")
                 .filter(new ServletBearerExchangeFilterFunction())
                 .build();
     }
-
 }

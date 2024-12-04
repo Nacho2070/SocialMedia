@@ -7,4 +7,6 @@ public class MailRequest {
     private String to;
     private String from;
     private String subject;
+
+    private String body;
 }

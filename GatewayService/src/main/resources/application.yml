@@ -1,4 +1,20 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:9090/realms/demo/protocol/openid-connect/certs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:9090/realms/demo
+        registration:
+          spring-with-test-scope:
+            provider: keycloak
+            client-id: spring-with-test-scope
+            client-secret: uR7wUJrWcg79eBI6dBJKZR0u0PFa9ydo
+            authorization-grant-type: authorization_code
+            scope: openid
   application:
     name: API-GATEWAY
   main:
@@ -6,15 +22,24 @@ spring:
 
   cloud:
     gateway:
+      default-filters:
+        - TokenRelay=
+
       routes:
-        - id: UserService
+        - id: USERSERVICE
           uri: lb://UserService
           predicates:
             - Path=/authUser/**
-        - id: PostService
+        - id: POSTSERVICE
           uri: lb://PostService
           predicates:
             - Path=/blogPost/**
+        - id: COMMENT-SERVICE
+          uri: lb://CommentsService/**
+          predicates:
+            - Path=/comment/**
+
+
 eureka:
   instance:
     prefer-ip-address: true

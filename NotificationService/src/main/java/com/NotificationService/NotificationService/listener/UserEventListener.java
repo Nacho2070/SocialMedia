@@ -4,12 +4,15 @@ import com.NotificationService.NotificationService.Dto.MailRequest;
 import com.NotificationService.NotificationService.event.User;
 import com.NotificationService.NotificationService.service.EmailService;
 import com.NotificationService.NotificationService.utils.JsonUtils;
+import com.NotificationService.NotificationService.utils.Template;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 @Component
 @Slf4j
@@ -19,7 +22,7 @@ public class UserEventListener {
     private final EmailService emailService;
 
     @KafkaListener(topics= "userRegistered")
-    public void handlerOrderNotifications(ConsumerRecord<String,String> message){
+    public void handlerOrderNotifications(ConsumerRecord<String,String> message) throws IOException {
         log.info("User added{}",message.value());
        User userDto = JsonUtils.fromJson(message.value(), User.class);
         System.out.println(userDto);
@@ -28,7 +31,7 @@ public class UserEventListener {
         mailRequest.setTo(userDto.email());
         mailRequest.setSubject("Registration made successfully"+userDto.username());
         mailRequest.setName(userDto.username());
-
+        mailRequest.setBody(Template.EMAIL_TEMPLATE);
         emailService.sendEmail(mailRequest);
     }
 }

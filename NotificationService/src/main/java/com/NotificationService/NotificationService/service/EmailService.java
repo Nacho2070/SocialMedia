@@ -37,7 +37,7 @@ public class EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name());
             // add attachment
-            Template t = config.getTemplate("email-template.ftl");
+            Template t = template(request.getBody());
             String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
             helper.setTo(request.getTo());
             helper.setText(html, true);
@@ -51,5 +51,13 @@ public class EmailService {
             response.setStatus(Boolean.FALSE);
         }
         return response;
+    }
+
+    private Template template(String templateUri) throws IOException {
+        if (templateUri == null || !templateUri.endsWith(".ftl")) {
+            throw new IllegalArgumentException("Template Uri cannot be null or empty");
+        }
+
+      return config.getTemplate(templateUri);
     }
 }

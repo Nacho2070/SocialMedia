@@ -1,7 +1,9 @@
 version: '3.7'
 
 services:
-  #Db user
+# ---------------------- DATABASE ----------------------
+
+# UserDB
   db-user:
     image: mysql:9.0
     environment:
@@ -14,7 +16,43 @@ services:
       - 3307:3306
     expose:
       - 3306
-  ### Zookeeper
+  # CommentDB
+  db-comment:
+    image: mysql:9.0
+    environment:
+      MYSQL_DATABASE: db_comment
+      MYSQL_USER: user123
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: RootPassword
+    restart: unless-stopped
+    ports:
+      - 3305:3306
+  # ---------------------- MONGODB ----------------------
+  # NotificationDB
+  db-notification:
+    image: mongo:8.0.3-noble
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - 27019:27017
+    volumes:
+      - mongodb_data_notification:/data/db
+
+  # PostServiceDB
+  db-blogPost:
+    image: mysql:9.0
+    environment:
+      MYSQL_DATABASE: db_blogPost
+      MYSQL_USER: user
+      MYSQL_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: RootPassword
+    ports:
+      - 3308:3306
+
+    restart: unless-stopped
+  # ---------------------- KAFKA CONFIG ----------------------
+# Zookeeper
   zookeeper:
     container_name: zookeeper
     image: confluentinc/cp-zookeeper:7.4.0
@@ -22,7 +60,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
-  ### Kafka
+# Kafka
   kafka:
     container_name: kafka
     image: confluentinc/cp-kafka:7.4.0
@@ -38,46 +76,18 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-#MongoDB
-  #NotificationDB
-  db-notification:
-    image: mongo:8.0.3-noble
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
-    ports:
-      - 27019:27017
-    volumes:
-      - mongodb_data_notification:/data/db
-  #PostServiceDB
-  db-blogPost:
-    image: mongo:8.0.3-noble
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: blogpost
-      MONGO_INITDB_ROOT_PASSWORD: rootpassword
-      MONGO_INITDB_DATABASE: db_blogPost
-    ports:
-      - 27018:27017
-    expose:
-      - 27018
-    volumes:
-      - mongodb_data_blogPost:/data/db
-  # Keycloak
+
+# ---------------------- KEYCLOAK ----------------------
+
+# Keycloak
   keycloak:
-    image: keycloak/keycloak:26.0.0
+    image: keycloak/keycloak:23.0.7
     command:
       - start-dev
       -  --import-realm
     environment:
-     # KC_DB: postgres
-     # KC_DB_URL_HOST: postgres
-     # KC_DB_URL_DATABASE: keycloak_v1
-     # KC_DB_PASSWORD: root
-     # KC_DB_USERNAME: postgres
-     # KC_DB_SCHEMA: public
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
-     # KEYCLOAK_JDBC_PARAMS: 'sslmode=disable'
     volumes:
       - /home/keycloak/realm.json:/opt/keycloak/data/import/realm.json
     ports:
@@ -85,24 +95,3 @@ services:
 volumes:
   mongodb_data_notification:
   mongodb_data_blogPost:
-
-
-  # postgres:
-   ## image: postgres:12
-   # command: ["postgres", "-c", "max_connections=200", "-c", "shared_buffers=24MB", "-c", "listen_addresses=*"]
-   # environment:
-    #  POSTGRES_DB: keycloak_v1
-    #  POSTGRES_USER: postgres
-    #  POSTGRES_PASSWORD: root
-   # healthcheck:
-    #    test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-     #   interval: 10s
-      #  timeout: 5s
-      #  retries: 5
-   # ports:
-    #  - "5436:5432"
-   # networks:
-   #   network_sso:
-   # volumes:
-    #  - postgres_data:/var/lib/postgresql/data
-    # user: postgres

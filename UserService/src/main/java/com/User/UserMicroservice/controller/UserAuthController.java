@@ -4,17 +4,18 @@ import com.User.UserMicroservice.dto.ChangePassword;
 import com.User.UserMicroservice.dto.UserDto;
 
 import com.User.UserMicroservice.dto.UserIdDto;
-import com.User.UserMicroservice.persistence.entity.User;
 import com.User.UserMicroservice.service.UserService;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/authUser")
 @AllArgsConstructor
+@Slf4j
 public class UserAuthController{
 
     private UserService userService;
@@ -60,8 +61,10 @@ public class UserAuthController{
         return ResponseEntity.ok("");
     }
 
+    @PreAuthorize("hasAuthority('SCOPE_TEST')")
     @GetMapping("/getUser/{id}")
     public ResponseEntity<UserIdDto> getUser(@PathVariable Long id) {
+        log.info("GET USER ENDPOINT");
          return ResponseEntity.ok(userService.getUserById(id));
     }
 }

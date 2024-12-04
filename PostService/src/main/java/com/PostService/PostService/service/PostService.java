@@ -14,7 +14,9 @@ import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -23,7 +25,6 @@ import java.util.List;
 public class PostService {
 
     private final BlogPostRepository blogPostRepository;
-    private final KafkaTemplate<String, String> kafkaTemplate;
     private final WebClient webClient;
 
     public void createPost(PostDto postDto){
@@ -31,28 +32,29 @@ public class PostService {
         Mono<UserDto> user = fetchUserById(Long.valueOf(postDto.authorId()));
         log.info("User response: {}", user.block().toString());
         UserDto userDto = user.block();
+
         BlogPost blogPost = BlogPost.builder()
+                .postDate(new Date())
                 .title(postDto.title())
                 .content(postDto.content())
                 .authorId(userDto.id())
                 .build();
-        System.out.println("Saving post...");
-      //  blogPostRepository.save(blogPost);
-        kafkaTemplate.send("PostTopic",blogPost.getBlogPostId().toString());
+        log.info("Saving post...");
+        blogPostRepository.save(blogPost);
     }
-
 
     public List<PostDto> getAllPosts() {
        List<BlogPost> blogPost = blogPostRepository.findAll();
-       List<PostDto> postDtos = new ArrayList<>();
+       List<PostDto> postDtoList = new ArrayList<>();
+
        blogPost.forEach(blogPostDto -> {
            PostDto postDto = new PostDto(blogPostDto.getTitle(),blogPostDto.getAuthorId(),blogPostDto.getContent());
-           postDtos.add(postDto);
+           postDtoList.add(postDto);
        });
-       return postDtos;
+       return postDtoList;
     }
 
-    public PostDto getPostById(String postId) {
+    public PostDto getPostById(Long postId) {
 
         BlogPost blogPost = blogPostRepository.findById(postId).orElseThrow(RuntimeException::new);
 
@@ -60,7 +62,7 @@ public class PostService {
 
     }
 
-    public void deletePost(String postId) {
+    public void deletePost(Long postId) {
         blogPostRepository.deleteById(postId);
 
     }
@@ -73,14 +75,14 @@ public class PostService {
        List<BlogPost> blogPostList = blogPostRepository.findAllByAuthorId(Long.toString(userId));
        List<PostDto> postDtoList = new ArrayList<>();
        blogPostList.forEach(blogPost -> {
-           PostDto postDto = new PostDto(blogPost.getTitle(),blogPost.getContent(),blogPost.getAuthorId());
+           PostDto postDto = new PostDto(blogPost.getTitle(),blogPost.getAuthorId(),blogPost.getContent());
            postDtoList.add(postDto);
        });
        return postDtoList;
     }
 
 
-    private Mono<UserDto> fetchUserById(Long userId){
+    protected Mono<UserDto> fetchUserById(Long userId){
         return webClient.get()
                 .uri("/authUser/getUser/{id}",userId)
                 .exchangeToMono(this::handleResponse);
@@ -104,5 +106,9 @@ public class PostService {
             // Handle other status codes as needed
             return Mono.error(new RuntimeException("Unexpected error"));
         }
+    }
+
+    protected BlogPost getPostId(Long postId) {
+        return blogPostRepository.findById(postId).orElseThrow(RuntimeException::new);
     }
 }

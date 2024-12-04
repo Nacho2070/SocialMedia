@@ -1,9 +1,17 @@
 package com.CommentsService.CommentsService.persistence;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "Comment")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Builder
 public class Comment {
 
     @Id
