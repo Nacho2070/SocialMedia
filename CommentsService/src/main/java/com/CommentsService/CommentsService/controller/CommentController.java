@@ -17,8 +17,8 @@ import java.util.List;
 @AllArgsConstructor
 @RequestMapping("/comment")
 public class CommentController {
-    private final CommentService commentService;
 
+    private final CommentService commentService;
 
     @PreAuthorize("hasAuthority('SCOPE_TEST')")
     @PostMapping("/add")

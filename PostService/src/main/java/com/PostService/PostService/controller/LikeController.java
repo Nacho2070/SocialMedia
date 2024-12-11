@@ -2,21 +2,20 @@ package com.PostService.PostService.controller;
 
 import com.PostService.PostService.persistence.entity.BlogPost;
 import com.PostService.PostService.service.LikeService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
-@RequestMapping("/like")
+@AllArgsConstructor
+@RequestMapping("/likes")
 public class LikeController {
 
-    @Autowired
-    private LikeService likeService;
+    private final LikeService likeService;
 
     @GetMapping("/getAll/{postId}")
     public int getAllLikes(@PathVariable Long postId){
@@ -28,7 +27,8 @@ public class LikeController {
         return new ResponseEntity<>(likeService.isLiked(userId, postId), HttpStatus.OK);
     }
 
-    @GetMapping("/add/{userId}/{postId}")
+    @PreAuthorize("hasAuthority('SCOPE_TEST')")
+    @PostMapping("/add/{userId}/{postId}")
     public BlogPost addLike(@PathVariable Long userId, @PathVariable Long postId) {
         return likeService.likePost(userId,postId);
     }

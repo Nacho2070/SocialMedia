@@ -6,5 +6,4 @@ import java.util.List;
 public interface BlogPostRepository extends JpaRepository<BlogPost, Long> {
     List<BlogPost> findAllByAuthorId(String userId);
 
-    Long countByLike(Integer postId);
 }

@@ -7,6 +7,7 @@ import com.User.UserMicroservice.dto.UserIdDto;
 import com.User.UserMicroservice.service.UserService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +20,11 @@ import org.springframework.web.bind.annotation.*;
 public class UserAuthController{
 
     private UserService userService;
+
+    @GetMapping("/test")
+    public ResponseEntity<String> testHeaders(@RequestHeader HttpHeaders headers) {
+        return ResponseEntity.ok(headers.toString());
+    }
 
     @PostMapping("/add")
     public ResponseEntity<Object> logUpUser(@RequestBody UserDto userDto){
@@ -61,7 +67,6 @@ public class UserAuthController{
         return ResponseEntity.ok("");
     }
 
-    @PreAuthorize("hasAuthority('SCOPE_TEST')")
     @GetMapping("/getUser/{id}")
     public ResponseEntity<UserIdDto> getUser(@PathVariable Long id) {
         log.info("GET USER ENDPOINT");

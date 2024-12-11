@@ -1,0 +1,10 @@
+openapi:
+  service:
+    title: test-service doc
+    version: 1.0.0
+    url: http://localhost:8181 #api gateway url
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

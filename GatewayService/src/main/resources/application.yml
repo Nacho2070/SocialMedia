@@ -24,7 +24,6 @@ spring:
     gateway:
       default-filters:
         - TokenRelay=
-
       routes:
         - id: USERSERVICE
           uri: lb://UserService
@@ -33,13 +32,27 @@ spring:
         - id: POSTSERVICE
           uri: lb://PostService
           predicates:
-            - Path=/blogPost/**
+            - Path=/blogPost/**, /likes/**
         - id: COMMENT-SERVICE
           uri: lb://CommentsService/**
           predicates:
             - Path=/comment/**
-
-
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service
+      - url: /test-service/v3/api-docs
+        name: Test Service
+      - url: /blogPost/v3/api-docs
+        name: Post Service
+      - url: /comment/v3/api-docs
+        name: Comment Service
 eureka:
   instance:
     prefer-ip-address: true
