@@ -7,14 +7,18 @@ import com.PostService.PostService.utils.UserDto;
 import lombok.AllArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,8 +37,13 @@ public class PostService {
         log.info("User response: {}", user.block().toString());
         UserDto userDto = user.block();
 
+        LocalDateTime myDateObj = LocalDateTime.now();
+        DateTimeFormatter myFormatObj = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        String formattedDate = myDateObj.format(myFormatObj);
+        System.out.println("formatted date: " + formattedDate);
+
         BlogPost blogPost = BlogPost.builder()
-                .postDate(new Date())
+                .postDate(formattedDate)
                 .title(postDto.title())
                 .content(postDto.content())
                 .authorId(userDto.id())
@@ -43,15 +52,9 @@ public class PostService {
         blogPostRepository.save(blogPost);
     }
 
-    public List<PostDto> getAllPosts() {
+    public List<BlogPost> getAllPosts() {
        List<BlogPost> blogPost = blogPostRepository.findAll();
-       List<PostDto> postDtoList = new ArrayList<>();
-
-       blogPost.forEach(blogPostDto -> {
-           PostDto postDto = new PostDto(blogPostDto.getTitle(),blogPostDto.getAuthorId(),blogPostDto.getContent());
-           postDtoList.add(postDto);
-       });
-       return postDtoList;
+       return blogPost;
     }
 
     public PostDto getPostById(Long postId) {
@@ -110,5 +113,13 @@ public class PostService {
 
     protected BlogPost getPostId(Long postId) {
         return blogPostRepository.findById(postId).orElseThrow(RuntimeException::new);
+    }
+
+    public static Date parseDate(String date) {
+        try {
+            return new SimpleDateFormat("dd-MM-yyyy").parse(date);
+        } catch (ParseException e) {
+            return null;
+        }
     }
 }

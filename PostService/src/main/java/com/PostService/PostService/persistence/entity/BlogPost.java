@@ -3,6 +3,8 @@ package com.PostService.PostService.persistence.entity;
 import  jakarta.persistence.*;
 import lombok.*;
 import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -24,7 +26,7 @@ public class BlogPost implements Serializable {
 
     private String title;
 
-    private Date postDate;
+    private String postDate;
 
     private String content;
 

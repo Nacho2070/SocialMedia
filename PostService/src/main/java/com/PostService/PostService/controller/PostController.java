@@ -1,6 +1,7 @@
 package com.PostService.PostService.controller;
 
 import com.PostService.PostService.dto.PostDto;
+import com.PostService.PostService.persistence.entity.BlogPost;
 import com.PostService.PostService.service.PostService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,13 +21,12 @@ public class PostController {
     @PreAuthorize("hasAuthority('SCOPE_TEST')")
     @PostMapping("/addPost")
     public void addPost(@RequestBody PostDto message) {
-        System.out.println("acasss");
         postService.createPost(message);
     }
 
     @GetMapping
-    public ResponseEntity<List<PostDto>> getAllPosts() {
-        List<PostDto> posts = postService.getAllPosts();
+    public ResponseEntity<List<BlogPost>> getAllPosts() {
+        List<BlogPost> posts = postService.getAllPosts();
         return ResponseEntity.ok(posts);
     }
 
